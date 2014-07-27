@@ -18,15 +18,36 @@ ifeq ($(ARCH),arm)
 TRIPLET := arm-linux-androideabi
 OPENSSL_TARGET := android-armv7
 EXTRA_CFLAGS := -march=armv7-a
+APIVER := android-14
 endif
 ifeq ($(ARCH),x86)
 TRIPLET := i686-linux-android
 OPENSSL_TARGET := android-x86
+APIVER := android-14
 endif
 ifeq ($(ARCH),mips)
 TRIPLET := mipsel-linux-android
 OPENSSL_TARGET := android
 EXTRA_LDFLAGS := -lz
+APIVER := android-14
+endif
+
+ifeq ($(ARCH),arm64)
+TRIPLET := aarch64-linux-android
+OPENSSL_TARGET := android
+APIVER := android-L
+EXTRA_LDFLAGS := -lz
+endif
+ifeq ($(ARCH),x86_64)
+TRIPLET := x86_64-linux-android
+OPENSSL_TARGET := android
+APIVER := android-L
+endif
+ifeq ($(ARCH),mips64)
+TRIPLET := mips64el-linux-android
+OPENSSL_TARGET := android
+EXTRA_LDFLAGS := -lz
+APIVER := android-L
 endif
 
 TOPDIR := $(shell pwd)
@@ -34,7 +55,7 @@ DESTDIR := $(TOPDIR)/$(TRIPLET)/out
 
 TOOLCHAIN := $(TOPDIR)/$(TRIPLET)/toolchain
 TOOLCHAIN_BUILT := $(TOOLCHAIN)/.built
-TOOLCHAIN_OPTS := --platform=android-14 --arch=$(ARCH) \
+TOOLCHAIN_OPTS := --platform=$(APIVER) --arch=$(ARCH) \
 		  --install-dir=$(TOOLCHAIN)
 PATH := $(TOOLCHAIN)/bin:$(PATH)
 
