@@ -10,7 +10,7 @@
 #
 # It should also be fairly simple to extend this to cross-compile for any target
 
-NDK     := /opt/android-sdk-linux_x86/android-ndk-r9b/
+NDK     := /opt/android-sdk-linux_x86/android-ndk-r10/
 ARCH    := arm
 
 # You should be able to just 'make ARCH=x86' and it should DTRT.
@@ -70,8 +70,8 @@ all: openconnect
 #
 $(TOOLCHAIN_BUILT):
 	mkdir -p $(TOOLCHAIN)
-	$(NDK)/build/tools/make-standalone-toolchain.sh $(TOOLCHAIN_OPTS) || \
-		$(NDK)/build/tools/make-standalone-toolchain.sh \
+	bash $(NDK)/build/tools/make-standalone-toolchain.sh $(TOOLCHAIN_OPTS) || \
+		bash $(NDK)/build/tools/make-standalone-toolchain.sh \
 			$(TOOLCHAIN_OPTS) --system=linux-x86_64
 	touch $@
 
