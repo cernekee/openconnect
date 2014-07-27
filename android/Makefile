@@ -91,6 +91,7 @@ $(LIBXML2_TAR):
 $(LIBXML2_SRC)/configure: $(LIBXML2_TAR)
 	mkdir -p sources
 	tar xfz $<  -C sources
+	cp -f config.sub $(LIBXML2_SRC)/
 	touch $@
 
 $(LIBXML2_BUILD)/Makefile: $(TOOLCHAIN_BUILT) $(LIBXML2_SRC)/configure
@@ -210,6 +211,7 @@ $(NETTLE_TAR):
 $(NETTLE_SRC)/configure: $(NETTLE_TAR)
 	mkdir -p sources
 	tar xfz $< -C sources
+	cp -f config.sub $(NETTLE_SRC)/
 	touch $@
 
 $(NETTLE_BUILD)/Makefile: $(TOOLCHAIN_BUILT) $(NETTLE_SRC)/configure $(GMP_DEPS)
