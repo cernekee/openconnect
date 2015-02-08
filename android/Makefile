@@ -55,10 +55,9 @@ CONFIGURE_ARGS := --host=$(TRIPLET) --prefix=$(OC_SYSROOT) \
 
 SOURCE_LIST = $(LIBXML2_SRC)/configure $(GMP_SRC)/configure \
 	$(NETTLE_SRC)/configure $(GNUTLS_SRC)/configure \
-	$(STOKEN_SRC)/configure $(OATH_SRC)/configure \
-	$(LZ4_DIR)/Makefile
+	$(STOKEN_SRC)/configure $(LZ4_DIR)/Makefile
 
-PKG_LIST := LIBXML2 OPENSSL GMP NETTLE GNUTLS STOKEN OATH LZ4
+PKG_LIST := LIBXML2 OPENSSL GMP NETTLE GNUTLS STOKEN LZ4
 
 MIRROR_TEST_TARGETS := $(addprefix mirror-test-,$(PKG_LIST))
 
@@ -315,41 +314,6 @@ stoken: $(STOKEN_DEPS)
 
 #####################################################################
 #
-# Build liboath
-#
-OATH_VER := 2.4.1
-OATH_TAR := oath-toolkit-$(OATH_VER).tar.gz
-OATH_SHA1 := b0ca4c5f89c12c550f7227123c2f21f45b2bf969
-OATH_SRC := sources/oath-toolkit-$(OATH_VER)
-OATH_BUILD := $(TRIPLET)/oath
-
-$(OATH_TAR):
-	$(FETCH) $@ $(OATH_SHA1)
-
-$(OATH_SRC)/configure: $(OATH_TAR)
-	mkdir -p sources
-	tar xfz $< -C sources
-	cd $(OATH_SRC) && patch -p1 < ../../0001-fflush-freadahead-fseeko-Fix-for-Android.patch
-	touch $@
-
-$(OATH_BUILD)/Makefile: $(TOOLCHAIN_BUILT) $(OATH_SRC)/configure
-	mkdir -p $(OATH_BUILD)
-	cd $(OATH_BUILD) && ../../$(OATH_SRC)/configure $(CONFIGURE_ARGS) \
-		--disable-pskc --disable-pam
-
-$(OATH_BUILD)/liboath/liboath.la: $(OATH_BUILD)/Makefile
-	$(MAKE) -C $(OATH_BUILD)
-
-$(OC_SYSROOT)/lib/liboath.la: $(OATH_BUILD)/liboath/liboath.la
-	$(MAKEINSTALL) -C $(OATH_BUILD) install
-
-OATH_DEPS := $(OC_SYSROOT)/lib/liboath.la
-
-oath: $(OATH_DEPS)
-
-
-#####################################################################
-#
 # Build liblz4
 #
 LZ4_VER := r127
@@ -389,7 +353,7 @@ $(OPENCONNECT_SRC)/configure:
 	cd $(OPENCONNECT_SRC) && ./autogen.sh
 
 $(OPENCONNECT_BUILD)/Makefile: $(TOOLCHAIN_BUILT) $(GNUTLS_DEPS) $(LIBXML_DEPS) \
-		$(STOKEN_DEPS) $(OATH_DEPS) $(LZ4_DEPS) $(OPENCONNECT_SRC)/configure
+		$(STOKEN_DEPS) $(LZ4_DEPS) $(OPENCONNECT_SRC)/configure
 	mkdir -p $(OPENCONNECT_BUILD)
 	cd $(OPENCONNECT_BUILD) && ../../../configure \
 	--host=$(TRIPLET) --prefix=/ \
