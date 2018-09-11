@@ -23,7 +23,7 @@ EXTRA_CFLAGS := -march=armv7-a -mthumb
 endif
 ifeq ($(ARCH),arm64)
 TRIPLET := aarch64-linux-android
-API_LEVEL := 26
+API_LEVEL := 21
 endif
 ifeq ($(ARCH),x86)
 TRIPLET := i686-linux-android
