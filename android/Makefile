@@ -10,7 +10,7 @@
 #
 # It should also be fairly simple to extend this to cross-compile for any target
 
-NDK     := /opt/android-sdk-linux_x86/android-ndk-r16b
+NDK     := /opt/android-sdk-linux_x86/android-ndk-r17c
 ARCH    := arm
 
 EXTRA_CFLAGS :=
