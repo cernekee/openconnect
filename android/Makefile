@@ -10,7 +10,7 @@
 #
 # It should also be fairly simple to extend this to cross-compile for any target
 
-NDK     := /opt/android-sdk-linux_x86/android-ndk-r16b
+NDK     := /opt/android-sdk-linux_x86/android-ndk-r21
 ARCH    := arm
 
 EXTRA_CFLAGS :=
@@ -18,7 +18,7 @@ EXTRA_CFLAGS :=
 # You should be able to just 'make ARCH=x86' and it should DTRT.
 ifeq ($(ARCH),arm)
 TRIPLET := arm-linux-androideabi
-API_LEVEL := 14
+API_LEVEL := 16
 EXTRA_CFLAGS := -march=armv7-a -mthumb
 endif
 ifeq ($(ARCH),arm64)
@@ -27,7 +27,7 @@ API_LEVEL := 26
 endif
 ifeq ($(ARCH),x86)
 TRIPLET := i686-linux-android
-API_LEVEL := 14
+API_LEVEL := 16
 endif
 ifeq ($(ARCH),x86_64)
 TRIPLET := x86_64-linux-android
@@ -78,10 +78,15 @@ all: openconnect run_pie
 # (The fallback logic is because NDK versions <= r8e can fail after trying to
 # use 32-bit binaries on a 64-bit NDK installation.)
 #
+#$(TOOLCHAIN_BUILT):
+#	$(NDK)/build/tools/make-standalone-toolchain.sh $(TOOLCHAIN_OPTS) || \
+#		$(NDK)/build/tools/make-standalone-toolchain.sh \
+#			$(TOOLCHAIN_OPTS) --system=linux-x86_64
+#	touch $@
 $(TOOLCHAIN_BUILT):
 	$(NDK)/build/tools/make-standalone-toolchain.sh $(TOOLCHAIN_OPTS) || \
 		$(NDK)/build/tools/make-standalone-toolchain.sh \
-			$(TOOLCHAIN_OPTS) --system=linux-x86_64
+			$(TOOLCHAIN_OPTS) 
 	touch $@
 
 #####################################################################
@@ -170,9 +175,9 @@ gmp: $(GMP_DEPS)
 #
 # Build nettle
 #
-NETTLE_VER := 3.4
+NETTLE_VER := 3.4.1
 NETTLE_TAR := nettle-$(NETTLE_VER).tar.gz
-NETTLE_SHA := ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a411e94
+NETTLE_SHA := f941cf1535cd5d1819be5ccae5babef01f6db611f9b5a777bae9c7604b8a92ad
 NETTLE_SRC := sources/nettle-$(NETTLE_VER)
 NETTLE_BUILD := $(TRIPLET)/nettle
 
@@ -203,9 +208,9 @@ nettle: $(NETTLE_DEPS)
 #
 # Build GnuTLS
 #
-GNUTLS_VER := 3.5.17
+GNUTLS_VER := 3.6.8
 GNUTLS_TAR := gnutls-$(GNUTLS_VER).tar.xz
-GNUTLS_SHA := 86b142afef587c118d63f72ccf307f3321dbc40357aae528202b65d913d20919
+GNUTLS_SHA := aa81944e5635de981171772857e72be231a7e0f559ae0292d2737de475383e83
 GNUTLS_SRC := sources/gnutls-$(GNUTLS_VER)
 GNUTLS_BUILD := $(TRIPLET)/gnutls
 
@@ -300,6 +305,9 @@ $(OATH_SRC)/configure: $(OATH_TAR)
 	mkdir -p sources
 	tar xfz $< -C sources
 	> $(OATH_SRC)/liboath/gl/freading.c
+	patch $(OATH_SRC)/oathtool/gl/vasnprintf.c < $(TOPDIR)/oathtool.diff
+	patch $(OATH_SRC)/liboath/gl/vasnprintf.c < $(TOPDIR)/liboath.diff
+	patch $(OATH_SRC)/libpskc/gl/tests/vasnprintf.c < $(TOPDIR)/libpskc.diff
 	touch $@
 
 $(OATH_BUILD)/Makefile: $(TOOLCHAIN_BUILT) $(OATH_SRC)/configure
